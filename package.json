@@ -1,0 +1,20 @@
+{
+  "name": "autoscript",
+  "version": "1.0.0",
+  "description": "NPM package to ease the integration of autoscript.js code, created by the Government of Spain, in our JS projects",
+  "main": "js/autoscript.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/doncicuto/autoscript.git"
+  },
+  "keywords": [
+    "autofirma",
+    "autoscript"
+  ],
+  "author": "Miguel Cabrerizo",
+  "license": "GPL-2.0-or-later",
+  "bugs": {
+    "url": "https://github.com/doncicuto/autoscript/issues"
+  },
+  "homepage": "https://github.com/doncicuto/autoscript#readme"
+}
