@@ -1,6 +1,6 @@
 # Autoscript
 
-The reason for this project is to provide an npm package for autoscript.js so it's easier to use it from your JS projects.
+The reason for this project is to provide an npm package for autoscript.js so it's easier to use it from your JS projects. I have created the NPM package under the scope @doncicuto in case of autoscript developers choose to upload an official npm package under autoscript name.
 
 This package contains autoscript.js, a README explaining what's Autofirma and Autoscript, some quick notes of usage, and the demo files provided with Autoscript on how to launch and use Autofirma from the browser.
 
@@ -34,7 +34,7 @@ or
 
 You can use Autofirma using the Autoscript object that will be available as a global variable once you add it to your html code using the following script tag:
 
-`<script src='node_modules/autoscript/autoscript.js'></script>`
+`<script src='node_modules/@doncicuto/autoscript/autoscript.js'></script>`
 
 Here's an html demo page, that will open Autofirma and allow you to select an X509 certificate from your browser's cert store.
 
@@ -48,7 +48,7 @@ Here's an html demo page, that will open Autofirma and allow you to select an X5
 </head>
 <body>
   <button onclick="selectCertificate()">Select certificate</button>
-  <script src='node_modules/autoscript/autoscript.js'></script>
+  <script src='node_modules/@doncicuto/autoscript/autoscript.js'></script>
   <script>
     function selectCertificate() {
       try {
