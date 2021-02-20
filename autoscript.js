@@ -43,27 +43,17 @@ var originalXMLHttpRequest = window.XMLHttpRequest;
 var AutoScript = (function (window, undefined) {
   var VERSION = "1.6.5";
 
-  var JAR_NAME = "miniapplet-full_1_6_5.jar";
-
   var JAVA_ARGUMENTS = "-Xms512M -Xmx512M ";
 
   var SYSTEM_PROPERTIES = null;
 
   var clienteFirma = null;
 
-  var codeBase = null;
-
-  var storageServletAddress = null;
-
-  var retrieverServletAddress = null;
-
   var jnlpServiceAddress = "";
 
   var clientType = null;
 
   var severeTimeDelay = false;
-
-  var selectedLocale = null;
 
   var stickySignatory = false;
 
