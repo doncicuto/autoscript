@@ -1,6 +1,6 @@
 {
   "name": "@doncicuto/autoscript",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "NPM package to ease the integration of autoscript.js code, created by the Government of Spain, in our JS projects",
   "main": "autoscript.js",
   "repository": {
