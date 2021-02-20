@@ -26,11 +26,11 @@ Government of Spain provides two html files that use autoscript.js and a constan
 
 You can use install autoscript using npm or yarn using:
 
-`npm install autoscript`
+`npm install @doncicuto/autoscript`
 
 or
 
-`yarn add autoscript`
+`yarn add @doncicuto/autoscript`
 
 You can use Autofirma using the Autoscript object that will be available as a global variable once you add it to your html code using the following script tag:
 
