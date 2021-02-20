@@ -50,11 +50,17 @@ var AutoScript = (function (window, undefined) {
 
   var clienteFirma = null;
 
+  var storageServletAddress = null;
+
+  var retrieverServletAddress = null;
+
   var jnlpServiceAddress = "";
 
   var clientType = null;
 
   var severeTimeDelay = false;
+
+  var selectedLocale = null;
 
   var stickySignatory = false;
 
