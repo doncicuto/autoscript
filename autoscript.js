@@ -1227,7 +1227,7 @@ var AutoScript = (function (window, undefined) {
         try {
           var element = document.getElementById("iframeAfirma");
           element.outerHTML = "";
-          delete element;
+          element.parentNode.removeChild(element);
         } catch (e) {
           // No hacemos nada
         }
