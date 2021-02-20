@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/doncicuto/autoscript/issues"
   },
-  "homepage": "https://github.com/doncicuto/autoscript#readme"
+  "homepage": "https://github.com/doncicuto/autoscript#readme",
+  "devDependencies": {
+    "eslint": "^7.20.0"
+  }
 }

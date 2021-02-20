@@ -1,0 +1,18 @@
+{
+    "env": {
+        "browser": true
+    },
+    "globals": {
+        "Sarissa": true,
+        "ActiveXObject": true,
+        "VBArray": true,
+        "Uint8Array": true,
+        "Uint32Array": true
+    },
+    "extends": "eslint:recommended",
+    "parserOptions": {
+        "ecmaVersion": 3
+    },
+    "rules": {
+    }
+}

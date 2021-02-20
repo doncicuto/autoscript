@@ -1,4 +1,7 @@
 // autoscript.js
+// Miguel Cabrerizo 2021 [https://github.com/doncicuto]
+// Removed unused vars and functions, use strict mode, applied Prettier, fixing code using ESLint...
+//
 // Copyright (C) 2011 [Gobierno de Espana]
 // This file is part of "Cliente @Firma".
 // "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
@@ -41,7 +44,7 @@ if (document.all && !window.setTimeout.isPolyfill) {
 
 var originalXMLHttpRequest = window.XMLHttpRequest;
 
-var AutoScript = (function (window, undefined) {
+var AutoScript = (function (window) {
   var VERSION = "1.6.5";
 
   var JAVA_ARGUMENTS = "-Xms512M -Xmx512M ";
@@ -50,17 +53,11 @@ var AutoScript = (function (window, undefined) {
 
   var clienteFirma = null;
 
-  var storageServletAddress = null;
-
-  var retrieverServletAddress = null;
-
   var jnlpServiceAddress = "";
 
   var clientType = null;
 
   var severeTimeDelay = false;
-
-  var selectedLocale = null;
 
   var stickySignatory = false;
 
@@ -71,7 +68,7 @@ var AutoScript = (function (window, undefined) {
     checktime_err:
       "Se ha detectado un desfase horario entre su sistema y el servidor. Debe corregir la hora de su sistema antes de continuar.",
     checktime_local_time: "Hora de su sistema",
-    checktime_server_time: "Hora del servidor",
+    checktime_server_time: "Hora del servidor"
   };
   LOCALIZED_STRINGS["gl_ES"] = {
     checktime_warn:
@@ -79,7 +76,7 @@ var AutoScript = (function (window, undefined) {
     checktime_err:
       "Destectouse un desfase horario entre o seu sistema e o servidor. Debe corrixir a hora do seu sistema antes de continuar.",
     checktime_local_time: "Hora do seu sistema",
-    checktime_server_time: "Hora do servidor",
+    checktime_server_time: "Hora do servidor"
   };
 
   var DEFAULT_LOCALE = LOCALIZED_STRINGS["es_ES"];
@@ -194,11 +191,6 @@ var AutoScript = (function (window, undefined) {
       navigator.userAgent.indexOf("Windows NT 6.2") != -1 /* Windows 8 */ ||
       navigator.userAgent.indexOf("Windows NT 6.3") != -1
     ); /* Windows 8.1 */
-  }
-
-  /** Determina con un boolean si nos encontramos en Windows RT */
-  function isWindowsRT() {
-    return isWindows8() && navigator.userAgent.indexOf("ARM;") != -1;
   }
 
   /** Determina con un boolean si nos encontramos en un sistema Linux. */
@@ -316,12 +308,6 @@ var AutoScript = (function (window, undefined) {
     return bJNLP;
   }
 
-  /** Indica si el navegador detecta Java. Este valor no es completamente fiable, ya que
-   * Internet Explorer siempre indica que si esta activado. */
-  function isJavaEnabled() {
-    return navigator.javaEnabled();
-  }
-
   /** Comprueba si una cadena de texto es una URL (http/https). La alternativa implicaria ser un Base64. */
   function isValidUrl(data) {
     return (
@@ -372,7 +358,7 @@ var AutoScript = (function (window, undefined) {
       };
     }
 
-    httpRequest.onload = function (evt) {
+    httpRequest.onload = function () {
       if (httpRequest.readyState == 4 && httpRequest.status == 200) {
         if (downloadSuccessFunction) {
           // emulating response field for IE9
@@ -980,7 +966,7 @@ var AutoScript = (function (window, undefined) {
 
         var fileNameArray = new Array();
         var dataB64Array = new Array();
-        for (i = 0; i < filenameDataBase64Pairs.length; i++) {
+        for (var i = 0; i < filenameDataBase64Pairs.length; i++) {
           var sepPos = filenameDataBase64Pairs[i].indexOf("|");
           if (sepPos == -1) {
             fileNameArray.push(filenameDataBase64Pairs[i]);
@@ -1077,7 +1063,6 @@ var AutoScript = (function (window, undefined) {
   };
 
   var setLocale = function (locale) {
-    selectedLocale = locale;
     currentLocale =
       locale == null || LOCALIZED_STRINGS[locale] == null
         ? DEFAULT_LOCALE
@@ -1093,96 +1078,10 @@ var AutoScript = (function (window, undefined) {
   };
 
   var setServlets = function (storageServlet, retrieverServlet) {
-    storageServletAddress = storageServlet;
-    retrieverServletAddress = retrieverServlet;
-
     if (clienteFirma && clienteFirma.setServlets) {
       clienteFirma.setServlets(storageServlet, retrieverServlet);
     }
   };
-
-  /*************************************************************
-   *  FUNCIONES PARA EL DESPLIEGUE DEL APPLET					 *
-   **************************************************************/
-
-  function loadMiniApplet(attributes, parameters) {
-    // Internet Explorer se carga mediante un
-    // elemento <object>. El resto con un <embed>.
-    if (isInternetExplorer()) {
-      var appletTag =
-        "<object classid='clsid:8AD9C840-044E-11D1-B3E9-00805F499D93' width='" +
-        attributes["width"] +
-        "' height='" +
-        attributes["height"] +
-        "' id='" +
-        attributes["id"] +
-        "'>";
-
-      if (attributes != undefined && attributes != null) {
-        for (var attribute in attributes) {
-          appletTag +=
-            "<param name='" +
-            attribute +
-            "' value='" +
-            attributes[attribute] +
-            "' />";
-        }
-      }
-
-      if (parameters != undefined && parameters != null) {
-        for (var parameter in parameters) {
-          appletTag +=
-            "<param name='" +
-            parameter +
-            "' value='" +
-            parameters[parameter] +
-            "' />";
-        }
-      }
-
-      appletTag += "</object>";
-
-      // Al agregar estos nodos con append() no se carga automaticamente el applet en IE10 e inferiores, asi que
-      // hay que usar document.write() o innerHTML. Para asegurarnos de no pisar HTML previo, crearemos un <div>
-      // en la pagina, lo recogeremos e insertaremos dentro suyo el codigo del applet.
-      var divElem = document.createElement("div");
-      var idAtt = document.createAttribute("id");
-      idAtt.value = "divAfirmaApplet";
-      divElem.setAttributeNode(idAtt);
-
-      document.body.appendChild(divElem);
-
-      document.getElementById("divAfirmaApplet").innerHTML = appletTag;
-    } else {
-      var embed = document.createElement("embed");
-
-      if (attributes != undefined && attributes != null) {
-        for (var attribute in attributes) {
-          var att = document.createAttribute(attribute);
-          att.value = attributes[attribute];
-          try {
-            embed.setAttributeNode(att);
-          } catch (e) {
-            // Probamos este como alternativa en caso de error. Caso detectado en:
-            // - IE10 sin modo de compabilidad con el Document Mode de IE7.
-            // - Firefox en Mac OS X
-            // Este intento no soluciona el error, pero evita que se propague
-            embed.setAttribute(attribute, attributes[attribute]);
-          }
-        }
-      }
-
-      if (parameters != undefined && parameters != null) {
-        for (var parameter in parameters) {
-          var att = document.createAttribute(parameter);
-          att.value = parameters[parameter];
-          embed.setAttributeNode(att);
-        }
-      }
-
-      document.body.appendChild(embed);
-    }
-  }
 
   /**
    * Establece los datos que debera procesar el applet MiniApplet. Los datos se le
@@ -1243,10 +1142,7 @@ var AutoScript = (function (window, undefined) {
       // capaces de manejar el protocolo, aprovechamos esta caracteristica (Internet Explorer para Windows 8 Modern UI)
 
       if (navigator.msLaunchUri) {
-        navigator.msLaunchUri(url, null, function () {
-          // Bloqueamos la conexion para evitar que se sigan haciendo comprobaciones
-          wrongInstallation = true;
-        });
+        navigator.msLaunchUri(url, null, function () {});
       } else {
         // Abrimos la URL por medio de un iframe
         openUrlWithIframe(url);
@@ -1348,10 +1244,7 @@ var AutoScript = (function (window, undefined) {
     }
   }
 
-  var AppAfirmaJSSocket = function (clientAddress, window, undefined) {
-    var UnsupportedOperationException =
-      "java.lang.UnsupportedOperationException";
-
+  var AppAfirmaJSSocket = function (clientAddress, window) {
     /**
      *  Atributos para la configuracion del objeto sustituto del applet Java de firma
      */
@@ -1382,9 +1275,6 @@ var AutoScript = (function (window, undefined) {
     /* Variable de control para la operacion guardar */
     var isSaveOperation = false;
 
-    /* Variable de control para la operacion de ejecutar operacion criptografica y guardar */
-    var isOpAndSaveOperation = false;
-
     /* Variable de control para la operacion batch */
     var isBatchOperation = false;
 
@@ -1403,9 +1293,6 @@ var AutoScript = (function (window, undefined) {
 
     /* Indica si se ha establecido la conexion o no */
     var connection = false;
-
-    /* Dominio desde el que se realiza la llamada al servicio */
-    var baseUri = clientAddress;
 
     /* Almacen de claves cargado por defecto */
     var defaultKeyStore = null;
@@ -1444,9 +1331,9 @@ var AutoScript = (function (window, undefined) {
         }
       }
 
-      for (var i = 0; i < ID_LENGTH; i++) {
+      for (var j = 0; j < ID_LENGTH; j++) {
         random += VALID_CHARS_TO_ID.charAt(
-          Math.floor(randomInts[i] % VALID_CHARS_TO_ID.length)
+          Math.floor(randomInts[j] % VALID_CHARS_TO_ID.length)
         );
       }
 
@@ -2030,9 +1917,6 @@ var AutoScript = (function (window, undefined) {
           isSaveOperation = currentOperationUrl.indexOf("afirma://save") > -1;
           // Comprobamos si es una operacion de firma por lotes
           isBatchOperation = currentOperationUrl.indexOf("afirma://batch") > -1;
-          // Comprobamos si es una operacion criptografica mas guardado del resultado
-          isOpAndSaveOperation =
-            currentOperationUrl.indexOf("afirma://signandsave") > -1;
           executeOperationByService();
         } else if (
           (!semaphore || !semaphore.locked) &&
@@ -2220,7 +2104,7 @@ var AutoScript = (function (window, undefined) {
         (i - 1) * URL_MAX_SIZE,
         Math.min(URL_MAX_SIZE * i, url.length)
       );
-      httpRequest.onreadystatechange = function (evt) {
+      httpRequest.onreadystatechange = function () {
         if (httpRequest.status == 404) {
           errorServiceResponseFunction(
             "java.lang.Exception",
@@ -2309,7 +2193,7 @@ var AutoScript = (function (window, undefined) {
      * Realiza una operacion que se ha mandando en varios fragmentos.
      */
     function doFirm() {
-      httpRequest = getHttpRequest();
+      var httpRequest = getHttpRequest();
       httpRequest.open("POST", urlHttpRequest, true);
       httpRequest.setRequestHeader(
         "Content-type",
@@ -2385,7 +2269,7 @@ var AutoScript = (function (window, undefined) {
      * Se encarga de solicitar y montar la respuesta de la operacion realizada.
      */
     function addFragmentRequest(part, totalParts) {
-      httpRequest = getHttpRequest();
+      var httpRequest = getHttpRequest();
       httpRequest.open("POST", urlHttpRequest, true);
       httpRequest.setRequestHeader(
         "Content-type",
@@ -2496,7 +2380,7 @@ var AutoScript = (function (window, undefined) {
         return;
       }
 
-      successCallback(data.replace(/\-/g, "+").replace(/\_/g, "/"));
+      successCallback(data.replace(/-/g, "+").replace(/_/g, "/"));
     }
 
     /**
@@ -2506,6 +2390,9 @@ var AutoScript = (function (window, undefined) {
      * @param data Resultado obtenido.
      */
     function successServiceResponseFunction(data) {
+      var fileName = null;
+      var dataB64 = null;
+
       // No se ha obtenido respuesta o se notifica la cancelacion
       if (data == undefined || data == null || data == "CANCEL") {
         errorCallback(
@@ -2595,8 +2482,8 @@ var AutoScript = (function (window, undefined) {
             fileName = fileNameDataBase64.substring(0, sepPos);
             dataB64 = fileNameDataBase64
               .substring(sepPos + 1)
-              .replace(/\-/g, "+")
-              .replace(/\_/g, "/");
+              .replace(/-/g, "+")
+              .replace(/_/g, "/");
           }
 
           successCallback(fileName, dataB64);
@@ -2606,8 +2493,8 @@ var AutoScript = (function (window, undefined) {
           var fileNameArray = new Array();
           var dataB64Array = new Array();
 
-          for (i = 0; i < fileNamesDataBase64.length; i++) {
-            var sepPos = fileNamesDataBase64[i].indexOf(":");
+          for (var i = 0; i < fileNamesDataBase64.length; i++) {
+            sepPos = fileNamesDataBase64[i].indexOf(":");
 
             if (sepPos == -1) {
               fileNameArray.push(fileNamesDataBase64[i]);
@@ -2617,8 +2504,8 @@ var AutoScript = (function (window, undefined) {
               dataB64Array.push(
                 fileNamesDataBase64[i]
                   .substring(sepPos + 1)
-                  .replace(/\-/g, "+")
-                  .replace(/\_/g, "/")
+                  .replace(/-/g, "+")
+                  .replace(/_/g, "/")
               );
             }
           }
@@ -2632,21 +2519,21 @@ var AutoScript = (function (window, undefined) {
       // Interpretamos el resultado como un base 64 y el certificado y los datos cifrados
       var signature;
       var certificate = null;
-      var sepPos = data.indexOf("|");
+      sepPos = data.indexOf("|");
 
       if (sepPos == -1) {
         signature = Base64.decode(data, true)
-          .replace(/\-/g, "+")
-          .replace(/\_/g, "/");
+          .replace(/-/g, "+")
+          .replace(/_/g, "/");
       } else {
         certificate = data
           .substring(0, sepPos)
-          .replace(/\-/g, "+")
-          .replace(/\_/g, "/");
+          .replace(/-/g, "+")
+          .replace(/_/g, "/");
         signature = data
           .substring(sepPos + 1)
-          .replace(/\-/g, "+")
-          .replace(/\_/g, "/");
+          .replace(/-/g, "+")
+          .replace(/_/g, "/");
       }
       successCallback(signature, certificate);
     }
@@ -2755,7 +2642,7 @@ var AutoScript = (function (window, undefined) {
      * Convierte texto plano en texto base 64.
      * Implementada en el applet Java de firma.
      */
-    function getBase64FromText(plainText, charset) {
+    function getBase64FromText(plainText) {
       return plainText != null ? Base64.encode(plainText) : null;
     }
 
@@ -2763,7 +2650,7 @@ var AutoScript = (function (window, undefined) {
      * Convierte texto base 64 en texto plano.
      * Implementada en el applet Java de firma.
      */
-    function getTextFromBase64(base64Text, charset) {
+    function getTextFromBase64(base64Text) {
       return base64Text != null ? Base64.decode(base64Text) : null;
     }
 
@@ -2903,22 +2790,6 @@ var AutoScript = (function (window, undefined) {
       return errorType;
     }
 
-    /**
-     * Funcion para identificar el tipo de objeto del Cliente (javascript, applet,...).
-     */
-    function getType() {
-      return "javascript";
-    }
-
-    /**
-     * Establece el error indicado como error interno y lanza una excepcion.
-     */
-    function throwException(type, message) {
-      errorType = type;
-      errorMessage = message;
-      throw new Error();
-    }
-
     /* Metodos que publicamos del objeto AppAfirmaJS */
     return {
       echo: echo,
@@ -2939,7 +2810,7 @@ var AutoScript = (function (window, undefined) {
       setLocale: setLocale,
       getErrorMessage: getErrorMessage,
       getErrorType: getErrorType,
-      getCurrentLog: getCurrentLog,
+      getCurrentLog: getCurrentLog
     };
   };
 
@@ -2947,10 +2818,7 @@ var AutoScript = (function (window, undefined) {
    * Objeto JavaScript que va a reemplazar al cliente de firma en los entornos en los que
    * no pueden ejecutarse applets.
    */
-  var AppAfirmaJSWebService = function (clientAddress, window, undefined) {
-    var UnsupportedOperationException =
-      "java.lang.UnsupportedOperationException";
-
+  var AppAfirmaJSWebService = function (clientAddress, window) {
     /* Longitud maxima de una URL en Android para la invocacion de una aplicacion nativa. */
     var MAX_LONG_ANDROID_URL = 2000;
 
@@ -3469,7 +3337,7 @@ var AutoScript = (function (window, undefined) {
      * Convierte texto plano en texto base 64.
      * Implementada en el applet Java de firma.
      */
-    function getBase64FromText(plainText, charset) {
+    function getBase64FromText(plainText) {
       return plainText != null ? Base64.encode(plainText) : null;
     }
 
@@ -3477,7 +3345,7 @@ var AutoScript = (function (window, undefined) {
      * Convierte texto base 64 en texto plano.
      * Implementada en el applet Java de firma.
      */
-    function getTextFromBase64(base64Text, charset) {
+    function getTextFromBase64(base64Text) {
       return Base64.decode(base64Text);
     }
 
@@ -3603,13 +3471,6 @@ var AutoScript = (function (window, undefined) {
     }
 
     /**
-     * Funcion para identificar el tipo de objeto del Cliente (javascript, applet,...).
-     */
-    function getType() {
-      return "javascript";
-    }
-
-    /**
      * Establece las rutas de los servlets encargados de almacenar y recuperar las firmas de los dispositivos moviles.
      */
     function setServlets(storageServlet, retrieverServlet) {
@@ -3672,9 +3533,9 @@ var AutoScript = (function (window, undefined) {
         }
       }
 
-      for (var i = 0; i < ID_LENGTH; i++) {
+      for (var j = 0; j < ID_LENGTH; j++) {
         random += VALID_CHARS_TO_ID.charAt(
-          Math.floor(randomInts[i] % VALID_CHARS_TO_ID.length)
+          Math.floor(randomInts[j] % VALID_CHARS_TO_ID.length)
         );
       }
 
@@ -3763,7 +3624,7 @@ var AutoScript = (function (window, undefined) {
       httpRequest.onreadystatechange = function () {
         if (httpRequest.readyState == 4) {
           if (httpRequest.status == 200) {
-            url = buildUrlWithoutData(
+            var url = buildUrlWithoutData(
               op,
               fileId,
               retrieverServletAddress,
@@ -3792,7 +3653,7 @@ var AutoScript = (function (window, undefined) {
         }
       };
       try {
-        httpRequest.onerror = function (e) {
+        httpRequest.onerror = function () {
           errorCallback(
             "java.lang.IOException",
             "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa"
@@ -4230,7 +4091,7 @@ var AutoScript = (function (window, undefined) {
       if (!base64UrlSave) {
         return base64UrlSave;
       }
-      return base64UrlSave.replace(/\-/g, "+").replace(/\_/g, "/");
+      return base64UrlSave.replace(/-/g, "+").replace(/_/g, "/");
     }
 
     /* Metodos que publicamos del objeto AppAfirmaJS */
@@ -4255,7 +4116,7 @@ var AutoScript = (function (window, undefined) {
       setLocale: setLocale,
       getErrorMessage: getErrorMessage,
       getErrorType: getErrorType,
-      getCurrentLog: getCurrentLog,
+      getCurrentLog: getCurrentLog
     };
   };
 
@@ -4319,7 +4180,7 @@ var AutoScript = (function (window, undefined) {
     isAndroid: isAndroid,
     isIOS: isIOS,
     isJNLP: isJNLP,
-    needNativeAppInstalled: needNativeAppInstalled,
+    needNativeAppInstalled: needNativeAppInstalled
   };
 })(window, undefined);
 
@@ -4446,8 +4307,8 @@ var Base64 = {
 
     input =
       URL_SAFE == true
-        ? input.replace(/[^A-Za-z0-9\-\_\=]/g, "")
-        : input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+        ? input.replace(/[^A-Za-z0-9\-_=]/g, "")
+        : input.replace(/[^A-Za-z0-9+/=]/g, "");
 
     while (i < input.length) {
       enc1 = keyStr.indexOf(input.charAt(i++));
@@ -4502,7 +4363,6 @@ var Base64 = {
     var string = "";
     var i = 0;
     var c = 0;
-    var c1 = 0;
     var c2 = 0;
 
     while (i < utftext.length) {
@@ -4526,7 +4386,7 @@ var Base64 = {
     }
 
     return string;
-  },
+  }
 };
 
 /* Paul Tero, July 2001
@@ -5675,9 +5535,8 @@ var Cipher = {
     try {
       byteString = String.fromCharCode.apply(null, byteArray);
     } catch (e) {
-      var byteString = "";
-      for (var i = 0, len = byteArray.length; i < len; i++) {
-        byteString += String.fromCharCode(byteArray[i]);
+      for (var j = 0, len = byteArray.length; j < len; j++) {
+        byteString += String.fromCharCode(byteArray[j]);
       }
     }
 
@@ -5766,12 +5625,12 @@ var Cipher = {
       c4,
       len = s.length; //define variables
     s += "===="; //just to make sure it is padded correctly
-    for (var i = 0; i < len; i += 4) {
+    for (var j = 0; j < len; j += 4) {
       //4 input characters at a time
-      c1 = s.charAt(i); //the 1st base64 input characther
-      c2 = s.charAt(i + 1);
-      c3 = s.charAt(i + 2);
-      c4 = s.charAt(i + 3);
+      c1 = s.charAt(j); //the 1st base64 input characther
+      c2 = s.charAt(j + 1);
+      c3 = s.charAt(j + 2);
+      c4 = s.charAt(j + 3);
       r += String.fromCharCode(((decode[c1] << 2) & 0xff) | (decode[c2] >> 4)); //reform the string
       if (c3 != "=")
         r += String.fromCharCode(
@@ -5804,5 +5663,5 @@ var Cipher = {
         (isNaN(b + c) ? "=" : table[c & 63]);
     }
     return base64.join("");
-  },
+  }
 };
