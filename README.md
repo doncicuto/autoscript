@@ -1,12 +1,14 @@
 # Autoscript
 
-The reason for this project is to provide an npm package for autoscript.js so it's easier to use it from your JS projects. I have created the NPM package under the scope @doncicuto in case of autoscript developers choose to upload an official npm package under autoscript name.
+The reason for this project is to provide an npm package for autoscript.js so it's easier to use it from your JS projects. I have created the NPM package under the scope @doncicuto in case of autoscript developers choose to upload an official npm package.
 
 This package contains autoscript.js, a README explaining what's Autofirma and Autoscript, some quick notes of usage, and the demo files provided with Autoscript on how to launch and use Autofirma from the browser.
 
 Autoscript.js is a javascript file developed by the Government of Spain to launch and use Autofirma from a web browser.
 
-Please, note that all credits for the source code and the demo files are for the Government of Spain developers and maintainer, this project only allows you to download and use autoscript.js from npmjs.
+> NOTE: In version 1.1.0 of this NPM package I've added strict mode, removed unused coded and used Prettier and ESLint to find some errors and format the file. If you want to use the unmodified autoscript.js developed by the Government of Spain, use version 1.0.0 instead.
+
+Please, note that all credits for the source code and the demo files are for the Government of Spain developers and maintainers.
 
 ## What is Autofirma and Autoscript?
 
