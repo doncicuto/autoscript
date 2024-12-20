@@ -1261,7 +1261,7 @@ var AutoScript = (function (window) {
     /* Tiempo de retardo para peticiones */
     var WAITING_TIME = 500;
 
-    var URL_REQUEST = "https://127.0.0.1:";
+    var URL_REQUEST = "https://localhost:";
 
     /* Respuesta del socket a la peticion realizada */
     var totalResponseRequest = "";
